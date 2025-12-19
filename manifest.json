@@ -1,0 +1,6 @@
+{
+    "name": "Anki Youtube Media Capture",
+    "description": "Captures audio and screenshots from youtube videos",
+    "version": "0.1",
+    "manifest_version": 3
+}
