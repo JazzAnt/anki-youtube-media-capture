@@ -6,7 +6,7 @@
     "content_scripts":[
         {
             "matches":["*://*.youtube.com/watch?v=*"],
-            "js":["main.js"]
+            "js":["scripts/control_buttons.js"]
         }
     ]
 }
