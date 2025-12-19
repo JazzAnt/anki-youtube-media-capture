@@ -2,5 +2,11 @@
     "name": "Anki Youtube Media Capture",
     "description": "Captures audio and screenshots from youtube videos",
     "version": "0.1",
-    "manifest_version": 3
+    "manifest_version": 3,
+    "content_scripts":[
+        {
+            "matches":["*://*.youtube.com/watch?v=*"],
+            "js":["main.js"]
+        }
+    ]
 }
