@@ -4,7 +4,8 @@ var ytplayer_controls = document.getElementsByClassName("ytp-right-controls")[0]
 var screenshot_key = "q"
 var record_key = "w"
 implement_screenshot_button(screenshot_key)
-implement_record_audio_button(record_key)
+implement_start_record_audio_button(record_key)
+implement_stop_record_audio_button(record_key)
 
 /**
  * Implement the take screenshot button to the youtube player
@@ -39,13 +40,13 @@ function implement_screenshot_button(shortcut_key)
 }
 
 /**
- * Implement the record button to the youtube player
+ * Implement the start record audio button to the youtube player. It is displayed by default.
  * @param {string} shortcut_key - The shortcut key to activate this button (this is only a UI indicator, does not add functionality)
  */
-function implement_record_audio_button(shortcut_key)
+function implement_start_record_audio_button(shortcut_key)
 {
     var record_audio_btn = document.createElement("button")
-    record_audio_btn.id = "record-audio-button"
+    record_audio_btn.id = "start-record-audio-button"
 
     addYoutubeButtonAttributes(record_audio_btn, "Start Audio Recording", shortcut_key)
 
@@ -68,6 +69,40 @@ function implement_record_audio_button(shortcut_key)
             </svg>
         `)
     )
+
+    implementButton(record_audio_btn)
+}
+
+/**
+ * Implement the stop record audio button to the youtube player. It is not displayed by default (it's intended to appear and replace 
+ * the start audio record button once that is clicked) 
+ * @param {string} shortcut_key - The shortcut key to activate this button (this is only a UI indicator, does not add functionality)
+ */
+function implement_stop_record_audio_button(shortcut_key)
+{
+    var record_audio_btn = document.createElement("button")
+    record_audio_btn.id = "stop-record-audio-button"
+    addYoutubeButtonAttributes(record_audio_btn, "Stop Audio Recording", shortcut_key)
+
+    record_audio_btn.append(
+        createDomElement(`
+            <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            xmlns:krita="http://krita.org/namespaces/svg/krita"
+            xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+            width="24"
+            height="24"
+            viewBox="0 0 5.76 5.76"
+            >
+            <rect id="shape0" transform="translate(1.2, 0.72)" fill="none" stroke="#ffffff" stroke-width="0.8136" stroke-linecap="square" stroke-linejoin="bevel" width="3.6" height="4.32"/>
+            <path id="shape1" transform="translate(2.27247434435576, 2.40383124287343)" fill="none" stroke="#ffffff" stroke-width="0.8136" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="2" d="M0 0L1.51717 0.00656784" sodipodi:nodetypes="cc"/>
+            <path id="shape2" transform="translate(2.18052451539339, 3.61231470923603)" fill="none" stroke="#ffffff" stroke-width="0.8136" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="2" d="M0 0L1.6551 0" sodipodi:nodetypes="cc"/>
+            </svg>
+            `)
+    )
+
+    record_audio_btn.style.display = "none"
 
     implementButton(record_audio_btn)
 }
