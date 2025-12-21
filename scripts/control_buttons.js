@@ -26,7 +26,6 @@ function implement_screenshot_button(shortcut_key)
                 height="24"
                 viewBox="0 0 5.76 5.76"
             >
-            <defs/>
             <circle id="shape0" transform="translate(1.92, 2.64)" r="0.84" cx="0.84" cy="0.84" fill="none" stroke="#ffffff" stroke-width="0.6264" stroke-linecap="square" stroke-linejoin="bevel"/>
             <rect id="shape1" transform="translate(0.48, 1.68)" fill="none" stroke="#ffffff" stroke-width="0.6264" stroke-linecap="square" stroke-linejoin="bevel" width="4.8" height="3.6"/>
             <path id="shape2" transform="translate(3.58874998997317, 0.776249997831187)" fill="none" stroke="#ffffff" stroke-width="0.6264" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="2" d="M0 0L1.1475 0.01125" sodipodi:nodetypes="cc"/>
@@ -61,18 +60,13 @@ function implementButton(button)
  */
 function addYoutubeButtonAttributes(button, tooltip, shortcut_key)
 {
-    //Add class necessary for youtube controller buttons
     if(!button.classList.contains("ytp-button"))
     { button.classList.add("ytp-button") }
 
-    //Set tooltip values
     button.setAttribute("aria-keyshortcuts", shortcut_key)
-    button.setAttribute("title", tooltip)
-    button.setAttribute("data-title-no-tooltip", tooltip)
-    button.setAttribute("data-tooltip-title", tooltip + " (" + shortcut_key + ")")
+    button.setAttribute("title", tooltip+ " keyboard shortcut (" + shortcut_key + ")")
     button.setAttribute("aria-label", tooltip + " keyboard shortcut " + shortcut_key)
 
-    //Set Styling
     button.style.display = "inline-block"
 }
 
