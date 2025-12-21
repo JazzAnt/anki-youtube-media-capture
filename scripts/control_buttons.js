@@ -2,7 +2,9 @@ var ytplayer_controls = document.getElementsByClassName("ytp-right-controls")[0]
 
 //TODO: This key should be able to be changed by the user
 var screenshot_key = "q"
+var record_key = "w"
 implement_screenshot_button(screenshot_key)
+implement_record_audio_button(record_key)
 
 /**
  * Implement the take screenshot button to the youtube player
@@ -34,6 +36,40 @@ function implement_screenshot_button(shortcut_key)
     )
 
     implementButton(screenshot_btn)
+}
+
+/**
+ * Implement the record button to the youtube player
+ * @param {string} shortcut_key - The shortcut key to activate this button (this is only a UI indicator, does not add functionality)
+ */
+function implement_record_audio_button(shortcut_key)
+{
+    var record_audio_btn = document.createElement("button")
+    record_audio_btn.id = "record-audio-button"
+
+    addYoutubeButtonAttributes(record_audio_btn, "Start Audio Recording", shortcut_key)
+
+    record_audio_btn.append(
+        createDomElement(`
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns:krita="http://krita.org/namespaces/svg/krita"
+                xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                width="24"
+                height="24"
+                viewBox="0 0 5.76 5.76"
+            >
+            <rect id="shape0" transform="translate(2.16, 0.72)" fill="none" stroke="#ffffff" stroke-width="0.6264" stroke-linecap="square" stroke-linejoin="bevel" width="1.44" height="2.88"/>
+            <path id="shape1" transform="translate(1.00124999720255, 3.02624999154477)" fill="none" stroke="#ffffff" stroke-width="0.6264" stroke-linecap="square" stroke-linejoin="bevel" d="M0.01125 0L0 0.8775L0.63 1.4175L1.7775 1.5975L3.25125 1.27125L3.63375 0.855L3.6225 0.09" sodipodi:nodetypes="ccccccc"/>
+            <path id="shape2" transform="translate(2.75624999229914, 4.7024999868614)" fill="none" stroke="#ffffff" stroke-width="0.6264" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="2" d="M0.01125 0L0 0.45" sodipodi:nodetypes="cc"/>
+            <path id="shape3" transform="translate(1.41749999603956, 5.47874998469258)" fill="none" stroke="#ffffff" stroke-width="0.6264" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="2" d="M0 0.0225L2.71125 0" sodipodi:nodetypes="cc"/>
+            <path id="shape4" transform="translate(2.87999999195339, 1.52999999572524)" fill="none" stroke="#ffffff" stroke-width="0.6264" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="2" d="M0 0L0.01125 1.29375" sodipodi:nodetypes="cc"/>
+            </svg>
+        `)
+    )
+
+    implementButton(record_audio_btn)
 }
 
 /**
