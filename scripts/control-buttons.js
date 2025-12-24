@@ -36,7 +36,22 @@ function implement_screenshot_button(shortcut_key)
         `)
     )
 
+    screenshot_btn.addEventListener("click", testMessage)
+
+
     implementButton(screenshot_btn)
+}
+
+function testMessage(){
+    (async () => {
+        try {
+            const response = await browser.runtime.sendMessage({greeting: "Hello, Background JS!"});
+            // This will only log once the background script calls sendResponse()
+            console.log("Response from background:", response);
+        } catch (error) {
+            console.error("Connection failed:", error.message);
+        }
+    })()
 }
 
 /**

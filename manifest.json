@@ -3,6 +3,9 @@
     "description": "Captures audio and screenshots from youtube videos",
     "version": "0.1",
     "manifest_version": 3,
+    "host_permissions": [
+        "http://localhost:8765/*"
+    ],
     "icons": {
         "16": "images/icon-16.png",
         "32": "images/icon-32.png",
@@ -10,10 +13,14 @@
         "96": "images/icon-96.png",
         "128": "images/icon-128.png"
     },
+    "background": {
+        "scripts": ["scripts/background-script.js"],
+        "type": "module"
+    },
     "content_scripts":[
         {
             "matches":["*://*.youtube.com/watch?v=*"],
-            "js":["scripts/control_buttons.js"]
+            "js":["scripts/control-buttons.js"]
         }
     ]
 }
