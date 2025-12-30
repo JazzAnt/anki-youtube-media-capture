@@ -1,3 +1,5 @@
+importScripts('scripts/browser-polyfill.js');
+
 browser.runtime.onMessage.addListener(handleMessages);
 
 // Event listener
