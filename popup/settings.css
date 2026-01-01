@@ -1,3 +1,53 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    background-color: lightcoral;
+    width: 300px;
+    padding: 1px 3px;
+}
+
+.title-container {
+    border: 4px solid darkred;
+    display: flex;
+    align-items: center;
+}
+
+.title {
+    border: 4px solid darkblue;
+    text-align: center;
+    padding-right: 10px;
+    flex-wrap: 1;
+}
+
+.title-icon {
+    border: 4px solid darkgreen;
+    height: 72px;
+    width: 72px;
+}
+
+.selector-container {
+    border: 4px solid red;
+    display: flex;
+}
+
+.selector-label {
+    border: 4px solid blue;
+    text-align: right;
+    font-weight: 700;
+    width: 75px;
+}
+
+.selector-colon {
+    border: 4px solid yellow;
+    text-align: center;
+    font-weight: 700;
+    width: 5px;
+}
+
+.selector {
+    border: 4px solid green;
+    flex-grow: 1;
 }

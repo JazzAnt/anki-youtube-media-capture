@@ -3,12 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Anki Youtube Media Capture Settings</title>
     <link rel="stylesheet" href="settings.css">
 </head>
 <body>
-    <h1>Settings</h1>
-    <p>Hello, World!</p>
+    <div class="title-container">
+        <h1 class="title">Anki Youtube Media Capture</h1>
+        <img src="../images/icon-128.png" alt="icon" class="title-icon">
+    </div>
+    <div class="selector-container">
+        <label for="note-type" class="selector-label">Note Type</label>
+        <label for="image-field" class="selector-colon">:</label>
+        <select name="note-type" id="note-type" class="selector">
+            <option value="test1">test1</option>
+            <option value="test2">test2</option>
+            <option value="test3">test3</option>
+        </select>
+    </div>
+    <div class="selector-container">
+        <label for="image-field" class="selector-label">Image Field</label>
+        <label for="image-field" class="selector-colon">:</label>
+        <select name="image-field" id="image-field" class="selector">
+            <option value="test1">field1</option>
+            <option value="test2">field2</option>
+            <option value="test3">field3</option>
+        </select>
+    </div>
+    <div class="selector-container">
+        <label for="audio-field" class="selector-label">Audio Field</label>
+        <label for="image-field" class="selector-colon">:</label>
+        <select name="audio-field" id="audio-field" class="selector">
+            <option value="test1">field1</option>
+            <option value="test2">field</option>
+            <option value="test3">field3</option>
+        </select>
+    </div>
 
     <script src="../scripts/settings.js"></script>
 </body>
