@@ -1,4 +1,4 @@
-importScripts('scripts/browser-polyfill.js');
+import "./browser-polyfill.js";
 
 browser.runtime.onMessage.addListener(handleMessages);
 
