@@ -28,6 +28,11 @@ body {
     width: 72px;
 }
 
+.status-container {
+    border: 4px solid lightcoral;
+    text-align: center;
+}
+
 .selector-container {
     border: 4px solid red;
     display: flex;
