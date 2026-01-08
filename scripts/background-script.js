@@ -21,6 +21,15 @@ const Actions = {
     } catch (e) {
     return { error: `Fetching Models Failed: ${e}`}
     }
+  },
+  "GET-FIELDNAMES": async (payload) => {
+    try {
+    const result = await ankiConnectInvoke('modelFieldNames', 6, payload);
+    console.log(`Got Field Names: ${result}`)
+    return result
+    } catch (e) {
+    return { error: `Fetching Field Names Failed: ${e}`}
+    }
   }
 }
 

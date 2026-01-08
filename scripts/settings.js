@@ -4,6 +4,11 @@
 // toggleSettingsVisibility(false)
 // validateAnkiConnect()
 
+document.getElementById("note-type").addEventListener('input', async function() {
+  const fieldNames = await getNoteFieldNames(this.value)
+  setFieldNameSelectors(fieldNames)
+})
+
 var connectButton = document.getElementById("connect-button");
 if (connectButton.addEventListener)
   connectButton.addEventListener("click", validateAnkiConnect, false);
@@ -83,6 +88,35 @@ function setNotetypeSelector(noteTypesArray = [""]){
     //TODO: If there is already a notetype saved in the storage, then add selected attribute to said notetype
     noteTypeSelector.appendChild(option)
   }
+}
+
+async function getNoteFieldNames(noteType){
+  try{
+    const response = await callBackgroundService('GET-FIELDNAMES', { "modelName": noteType })
+    //Not sure if there is a better way to extract the data than this toString into split
+    const fieldNames = response.toString().split(',')
+    return fieldNames;
+  } catch (e) {
+    //If error, re-validate AnkiConnect to see if connection has been lost
+    validateAnkiConnect()
+  }
+}
+
+function setFieldNameSelectors(fieldNamesArray = [""]){
+  const imageFieldSelector = document.getElementById("image-field")
+  const audioFieldSelector = document.getElementById("audio-field")
+
+  imageFieldSelector.innerHTML = ""
+  audioFieldSelector.innerHTML = ""
+
+  for (let fieldName of fieldNamesArray){
+    const option = document.createElement("option")
+    option.value = fieldName
+    option.textContent= fieldName
+    //TODO if there are values saved in the storage, add selected to appropriate options
+    imageFieldSelector.appendChild(option)
+    audioFieldSelector.appendChild(option.cloneNode(true))
+  } 
 }
 
 async function onSaveButtonClick(){
