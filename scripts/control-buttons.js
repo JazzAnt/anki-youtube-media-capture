@@ -1,25 +1,25 @@
-var ytplayer_controls = document.getElementsByClassName("ytp-right-controls")[0]
+var ytplayer_controls =
+  document.getElementsByClassName("ytp-right-controls")[0];
 
 //TODO: This key should be able to be changed by the user
-var screenshot_key = "q"
-var record_key = "w"
-implement_screenshot_button(screenshot_key)
-implement_start_record_audio_button(record_key)
-implement_stop_record_audio_button(record_key)
+var screenshot_key = "q";
+var record_key = "w";
+implement_screenshot_button(screenshot_key);
+implement_start_record_audio_button(record_key);
+implement_stop_record_audio_button(record_key);
 
 /**
  * Implement the take screenshot button to the youtube player
  * @param {string} shortcut_key - The shortcut key to activate this button (this is only a UI indicator, does not add functionality)
  */
-function implement_screenshot_button(shortcut_key)
-{
-    var screenshot_btn = document.createElement("button")
-    screenshot_btn.id = "screenshot-button"
+function implement_screenshot_button(shortcut_key) {
+  var screenshot_btn = document.createElement("button");
+  screenshot_btn.id = "screenshot-button";
 
-    addYoutubeButtonAttributes(screenshot_btn, "Take Screenshot", shortcut_key)
+  addYoutubeButtonAttributes(screenshot_btn, "Take Screenshot", shortcut_key);
 
-    screenshot_btn.append(
-        createDomElement(`
+  screenshot_btn.append(
+    createDomElement(`
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
                 xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -34,39 +34,43 @@ function implement_screenshot_button(shortcut_key)
             <path id="shape2" transform="translate(3.58874998997317, 0.776249997831187)" fill="none" stroke="#ffffff" stroke-width="0.6264" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="2" d="M0 0L1.1475 0.01125" sodipodi:nodetypes="cc"/>
             </svg>
         `)
-    )
+  );
 
-    screenshot_btn.addEventListener("click", testMessage)
+  screenshot_btn.addEventListener("click", testMessage);
 
-
-    implementButton(screenshot_btn)
+  implementButton(screenshot_btn);
 }
 
-function testMessage(){
-    (async () => {
-        try {
-            const response = await browser.runtime.sendMessage({greeting: "Hello, Background JS!"});
-            // This will only log once the background script calls sendResponse()
-            console.log("Response from background:", response);
-        } catch (error) {
-            console.error("Connection failed:", error.message);
-        }
-    })()
+function testMessage() {
+  (async () => {
+    try {
+      const response = await browser.runtime.sendMessage({
+        greeting: "Hello, Background JS!",
+      });
+      // This will only log once the background script calls sendResponse()
+      console.log("Response from background:", response);
+    } catch (error) {
+      console.error("Connection failed:", error.message);
+    }
+  })();
 }
 
 /**
  * Implement the start record audio button to the youtube player. It is displayed by default.
  * @param {string} shortcut_key - The shortcut key to activate this button (this is only a UI indicator, does not add functionality)
  */
-function implement_start_record_audio_button(shortcut_key)
-{
-    var record_audio_btn = document.createElement("button")
-    record_audio_btn.id = "start-record-audio-button"
+function implement_start_record_audio_button(shortcut_key) {
+  var record_audio_btn = document.createElement("button");
+  record_audio_btn.id = "start-record-audio-button";
 
-    addYoutubeButtonAttributes(record_audio_btn, "Start Audio Recording", shortcut_key)
+  addYoutubeButtonAttributes(
+    record_audio_btn,
+    "Start Audio Recording",
+    shortcut_key
+  );
 
-    record_audio_btn.append(
-        createDomElement(`
+  record_audio_btn.append(
+    createDomElement(`
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
                 xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -83,24 +87,27 @@ function implement_start_record_audio_button(shortcut_key)
             <path id="shape4" transform="translate(2.87999999195339, 1.52999999572524)" fill="none" stroke="#ffffff" stroke-width="0.6264" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="2" d="M0 0L0.01125 1.29375" sodipodi:nodetypes="cc"/>
             </svg>
         `)
-    )
+  );
 
-    implementButton(record_audio_btn)
+  implementButton(record_audio_btn);
 }
 
 /**
- * Implement the stop record audio button to the youtube player. It is not displayed by default (it's intended to appear and replace 
- * the start audio record button once that is clicked) 
+ * Implement the stop record audio button to the youtube player. It is not displayed by default (it's intended to appear and replace
+ * the start audio record button once that is clicked)
  * @param {string} shortcut_key - The shortcut key to activate this button (this is only a UI indicator, does not add functionality)
  */
-function implement_stop_record_audio_button(shortcut_key)
-{
-    var record_audio_btn = document.createElement("button")
-    record_audio_btn.id = "stop-record-audio-button"
-    addYoutubeButtonAttributes(record_audio_btn, "Stop Audio Recording", shortcut_key)
+function implement_stop_record_audio_button(shortcut_key) {
+  var record_audio_btn = document.createElement("button");
+  record_audio_btn.id = "stop-record-audio-button";
+  addYoutubeButtonAttributes(
+    record_audio_btn,
+    "Stop Audio Recording",
+    shortcut_key
+  );
 
-    record_audio_btn.append(
-        createDomElement(`
+  record_audio_btn.append(
+    createDomElement(`
             <svg 
             xmlns="http://www.w3.org/2000/svg" 
             xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -115,27 +122,27 @@ function implement_stop_record_audio_button(shortcut_key)
             <path id="shape2" transform="translate(2.18052451539339, 3.61231470923603)" fill="none" stroke="#ffffff" stroke-width="0.8136" stroke-linecap="square" stroke-linejoin="miter" stroke-miterlimit="2" d="M0 0L1.6551 0" sodipodi:nodetypes="cc"/>
             </svg>
             `)
-    )
+  );
 
-    record_audio_btn.style.display = "none"
+  record_audio_btn.style.display = "none";
 
-    implementButton(record_audio_btn)
+  implementButton(record_audio_btn);
 }
 
 /**
- * Implements a button to the youtube player controller. This function checks the button ID. If no button 
- * with said ID exists then it will add the button. If there is already an existing button with this ID 
+ * Implements a button to the youtube player controller. This function checks the button ID. If no button
+ * with said ID exists then it will add the button. If there is already an existing button with this ID
  * then the new button will replace the old button.
  * @param {HTMLButtonElement} button - The button you want to implement to the youtube player controller
- * @param {string} button.id - The button's ID is used to check if there is an existing button with the same ID 
+ * @param {string} button.id - The button's ID is used to check if there is an existing button with the same ID
  */
-function implementButton(button)
-{
-    var existingButton = document.getElementById(button.id)
-    if(typeof(existingButton) != "undefined" && existingButton != null)
-    { ytplayer_controls.replaceChild(button, existingButton) }
-    else
-    { ytplayer_controls.insertBefore(button, ytplayer_controls.firstChild) }
+function implementButton(button) {
+  var existingButton = document.getElementById(button.id);
+  if (typeof existingButton != "undefined" && existingButton != null) {
+    ytplayer_controls.replaceChild(button, existingButton);
+  } else {
+    ytplayer_controls.insertBefore(button, ytplayer_controls.firstChild);
+  }
 }
 
 /**
@@ -144,25 +151,31 @@ function implementButton(button)
  * @param {string} tooltip - The name of the button that appears when you hover over it
  * @param {string} shortcut_key - The shortcut key to press the button (only an indicator, the functionality is declared elsewhere)
  */
-function addYoutubeButtonAttributes(button, tooltip, shortcut_key)
-{
-    if(!button.classList.contains("ytp-button"))
-    { button.classList.add("ytp-button") }
+function addYoutubeButtonAttributes(button, tooltip, shortcut_key) {
+  if (!button.classList.contains("ytp-button")) {
+    button.classList.add("ytp-button");
+  }
 
-    button.setAttribute("aria-keyshortcuts", shortcut_key)
-    button.setAttribute("title", tooltip+ " keyboard shortcut (" + shortcut_key + ")")
-    button.setAttribute("aria-label", tooltip + " keyboard shortcut " + shortcut_key)
+  button.setAttribute("aria-keyshortcuts", shortcut_key);
+  button.setAttribute(
+    "title",
+    tooltip + " keyboard shortcut (" + shortcut_key + ")"
+  );
+  button.setAttribute(
+    "aria-label",
+    tooltip + " keyboard shortcut " + shortcut_key
+  );
 
-    button.style.display = "inline-block"
+  button.style.display = "inline-block";
 }
 
 /**
- * Creates a JS DOM element from a HTML string text. 
+ * Creates a JS DOM element from a HTML string text.
  * I ripped this function straight from https://developer.chrome.com/docs/extensions/get-started/tutorial/service-worker-events.
  * @param {string} html - a HTML string text
  * @returns a DOM element made of the parsed HTML string
  */
 function createDomElement(html) {
-  const dom = new DOMParser().parseFromString(html, 'text/html');
+  const dom = new DOMParser().parseFromString(html, "text/html");
   return dom.body.firstElementChild;
 }

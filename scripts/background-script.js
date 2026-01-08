@@ -3,65 +3,64 @@ import "./browser-polyfill.js";
 browser.runtime.onMessage.addListener(handleMessages);
 
 const Actions = {
-  "TEST-CONNECTION": async (payload) => {
+  "TEST-CONNECTION": async () => {
     try {
-    const result = await ankiConnectInvoke('version', 6);
-    console.log(`Got AnkiConnect Version: ${result}`);
-    return { response: true }
+      const result = await ankiConnectInvoke("version", 6);
+      console.log(`Got AnkiConnect Version: ${result}`);
+      return { response: true };
     } catch (e) {
-    console.log(`Test Connection Failed: ${e}`);
-    return { response: false }
+      console.log(`Test Connection Failed: ${e}`);
+      return { response: false };
     }
   },
-  "GET-NOTETYPES": async (payload) => {
+  "GET-MODELS": async () => {
     try {
-    const result = await ankiConnectInvoke('modelNames', 6);
-    console.log(`Got Note Types: ${result}`)
-    return result
+      const result = await ankiConnectInvoke("modelNames", 6);
+      console.log(`Got Models: ${result}`);
+      return result;
     } catch (e) {
-    return { error: `Fetching Models Failed: ${e}`}
+      return { error: `Fetching Models Failed: ${e}` };
     }
   },
-  "GET-FIELDNAMES": async (payload) => {
+  "GET-FIELDS": async (params) => {
     try {
-    const result = await ankiConnectInvoke('modelFieldNames', 6, payload);
-    console.log(`Got Field Names: ${result}`)
-    return result
+      const result = await ankiConnectInvoke("modelFieldNames", 6, params);
+      console.log(`Got Field Names: ${result}`);
+      return result;
     } catch (e) {
-    return { error: `Fetching Field Names Failed: ${e}`}
+      return { error: `Fetching Field Names Failed: ${e}` };
     }
-  }
-}
+  },
+};
 
-// Event listener
 function handleMessages(message, sender) {
-  var action = Actions[message.action]
-  if (action) { return action(message.payload) }
+  var action = Actions[message.action];
+  if (action) {
+    return action(message.params);
+  }
 
-  return Promise.resolve({ error: `Action ${message.action} not found` })
+  return Promise.resolve({ error: `Action ${message.action} not found` });
 }
 
-async function ankiConnectInvoke(action, version, params={}) {
-  try
-  {
-    const response = await fetch('http://127.0.0.1:8765', {
-      method: 'POST',
-      body: JSON.stringify({action, version, params})
+async function ankiConnectInvoke(action, version, params = {}) {
+  try {
+    const response = await fetch("http://127.0.0.1:8765", {
+      method: "POST",
+      body: JSON.stringify({ action, version, params }),
     });
 
-    if(!response.ok){
-      throw new Error("Failed to connect to AnkiConnect")
+    if (!response.ok) {
+      throw new Error("Failed to connect to AnkiConnect");
     }
 
     const json = await response.json();
 
-    if(json.error){
-      throw json.error
+    if (json.error) {
+      throw json.error;
     }
 
     return json.result;
-  }
-  catch (error) {
-    throw new Error(`AnkiConnect Error: ${error}`)
+  } catch (error) {
+    throw new Error(`AnkiConnect Error: ${error}`);
   }
 }

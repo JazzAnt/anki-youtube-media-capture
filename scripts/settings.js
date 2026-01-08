@@ -1,13 +1,15 @@
 /*
  * These two functions should be uncommented when ready for deployment, but they're commented for easier testing
-*/
+ */
 // toggleSettingsVisibility(false)
 // validateAnkiConnect()
 
-document.getElementById("note-type").addEventListener('input', async function() {
-  const fieldNames = await getNoteFieldNames(this.value)
-  setFieldNameSelectors(fieldNames)
-})
+document
+  .getElementById("model-field")
+  .addEventListener("input", async function () {
+    const fieldNames = await getFieldNames(this.value);
+    setFieldSelectorsOptions(fieldNames);
+  });
 
 var connectButton = document.getElementById("connect-button");
 if (connectButton.addEventListener)
@@ -19,125 +21,124 @@ var saveButton = document.getElementById("save-button");
 if (saveButton.addEventListener)
   saveButton.addEventListener("click", onSaveButtonClick, false);
 else if (saveButton.attachEvent)
-  saveButton.attachEvent('onclick', onSaveButtonClick);
+  saveButton.attachEvent("onclick", onSaveButtonClick);
 
 async function validateAnkiConnect() {
-  const statusMessage = document.getElementById("status-message")
-  const connectButton = document.getElementById("connect-button")
+  const statusMessage = document.getElementById("status-message");
+  const connectButton = document.getElementById("connect-button");
 
-  connectButton.style.display= "none"
-  statusMessage.innerHTML = "Checking Connection..."
-  statusMessage.style.color = "blue"
-  const response = await callBackgroundService('TEST-CONNECTION', { message: "Hello from Popup!" })
-  connectButton.style.display= "inline-block"
+  connectButton.style.display = "none";
+  statusMessage.textContent = "Checking Connection...";
+  statusMessage.style.color = "blue";
+  const response = await callBackgroundService("TEST-CONNECTION");
+  connectButton.style.display = "inline-block";
 
-  //response.response here returns true if connection is successful
+  //response.response returns true if connection is successful
   if (response.response) {
-    statusMessage.innerHTML = "Connected to Anki"
-    statusMessage.style.color = "green"
-    toggleSettingsVisibility(true)
-  }
-  else {
-    statusMessage.innerHTML = "Not Connected to Anki"
-    statusMessage.style.color = "red"
-    toggleSettingsVisibility(false)
+    statusMessage.textContent = "Connected to Anki";
+    statusMessage.style.color = "green";
+    toggleSettingsVisibility(true);
+  } else {
+    statusMessage.textContent = "Not Connected to Anki";
+    statusMessage.style.color = "red";
+    toggleSettingsVisibility(false);
   }
 }
 
 function toggleSettingsVisibility(isVisible) {
-  const selectors = document.getElementsByClassName("selector-container")
-  const buttons = document.getElementsByClassName("button-container")
+  const selectors = document.getElementsByClassName("selector-container");
+  const buttons = document.getElementsByClassName("button-container");
 
-  if (isVisible){
-    for(i = 0; i < selectors.length; i++){
-      selectors[i].style.display = "flex"
+  if (isVisible) {
+    for (i = 0; i < selectors.length; i++) {
+      selectors[i].style.display = "flex";
     }
-    for(i = 0; i < buttons.length; i++){
-      buttons[i].style.display = "block"
+    for (i = 0; i < buttons.length; i++) {
+      buttons[i].style.display = "block";
     }
   } else {
-    for(i = 0; i < selectors.length; i++){
-      selectors[i].style.display = "none"
+    for (i = 0; i < selectors.length; i++) {
+      selectors[i].style.display = "none";
     }
-    for(i = 0; i < buttons.length; i++){
-      buttons[i].style.display = "none"
+    for (i = 0; i < buttons.length; i++) {
+      buttons[i].style.display = "none";
     }
   }
 }
 
-async function getNoteTypes() {
-  try{
-    const response = await callBackgroundService('GET-NOTETYPES', { message: "Hello from Popup!" })
+async function getModels() {
+  try {
+    const response = await callBackgroundService("GET-MODELS");
     //Not sure if there is a better way to extract the data than this toString into split
-    const noteTypes = response.toString().split(',')
-    return noteTypes;
-
+    const models = response.toString().split(",");
+    return models;
   } catch (e) {
     //If error, re-validate AnkiConnect to see if connection has been lost
-    validateAnkiConnect()
+    validateAnkiConnect();
   }
 }
 
-function setNotetypeSelector(noteTypesArray = [""]){
-  const noteTypeSelector = document.getElementById("note-type")
-  noteTypeSelector.innerHTML = ""
-  for (let noteType of noteTypesArray){
-    const option = document.createElement("option")
-    option.value = noteType
-    option.innerHTML = noteType
+function setModelSelectorOptions(models = [""]) {
+  const modelSelector = document.getElementById("model-field");
+  modelSelector.innerHTML = "";
+  for (let model of models) {
+    const modelOption = document.createElement("option");
+    modelOption.value = model;
+    modelOption.textContent = model;
     //TODO: If there is already a notetype saved in the storage, then add selected attribute to said notetype
-    noteTypeSelector.appendChild(option)
+    modelSelector.appendChild(modelOption);
   }
 }
 
-async function getNoteFieldNames(noteType){
-  try{
-    const response = await callBackgroundService('GET-FIELDNAMES', { "modelName": noteType })
+async function getFieldNames(model) {
+  try {
+    const response = await callBackgroundService("GET-FIELDS", {
+      modelName: model,
+    });
     //Not sure if there is a better way to extract the data than this toString into split
-    const fieldNames = response.toString().split(',')
+    const fieldNames = response.toString().split(",");
     return fieldNames;
   } catch (e) {
     //If error, re-validate AnkiConnect to see if connection has been lost
-    validateAnkiConnect()
+    validateAnkiConnect();
   }
 }
 
-function setFieldNameSelectors(fieldNamesArray = [""]){
-  const imageFieldSelector = document.getElementById("image-field")
-  const audioFieldSelector = document.getElementById("audio-field")
+function setFieldSelectorsOptions(fieldsArray = [""]) {
+  const imageFieldSelector = document.getElementById("image-field");
+  const audioFieldSelector = document.getElementById("audio-field");
 
-  imageFieldSelector.innerHTML = ""
-  audioFieldSelector.innerHTML = ""
+  imageFieldSelector.innerHTML = "";
+  audioFieldSelector.innerHTML = "";
 
-  for (let fieldName of fieldNamesArray){
-    const option = document.createElement("option")
-    option.value = fieldName
-    option.textContent= fieldName
+  for (let field of fieldsArray) {
+    const fieldOption = document.createElement("option");
+    fieldOption.value = field;
+    fieldOption.textContent = field;
     //TODO if there are values saved in the storage, add selected to appropriate options
-    imageFieldSelector.appendChild(option)
-    audioFieldSelector.appendChild(option.cloneNode(true))
-  } 
+    imageFieldSelector.appendChild(fieldOption);
+    audioFieldSelector.appendChild(fieldOption.cloneNode(true));
+  }
 }
 
-async function onSaveButtonClick(){
-  const noteTypes = await getNoteTypes();
-  setNotetypeSelector(noteTypes);
+async function onSaveButtonClick() {
+  const models = await getModels();
+  setModelSelectorOptions(models);
 }
 
-async function callBackgroundService(action, payload = {}) {
+async function callBackgroundService(action, params = {}) {
   try {
     const response = await browser.runtime.sendMessage({
       action: action,
-      payload: payload
+      params: params,
     });
 
     if (response && response.error) {
-      throw new Error(`Background Script Error: ${response.error}`)
+      throw new Error(`Background Script Error: ${response.error}`);
     }
-    return response
-  }
-  catch (error) {
-    console.log(error.message)
-    throw new Error(error.message)
+    return response;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
   }
 }
