@@ -1,5 +1,8 @@
-toggleSettingsVisibility(false)
-validateAnkiConnect()
+/*
+ * These two functions should be uncommented when ready for deployment, but they're commented for easier testing
+*/
+// toggleSettingsVisibility(false)
+// validateAnkiConnect()
 
 var connectButton = document.getElementById("connect-button");
 if (connectButton.addEventListener)
@@ -57,8 +60,34 @@ function toggleSettingsVisibility(isVisible) {
   }
 }
 
-async function onSaveButtonClick() {
-  document.getElementById("button-message").innerHTML = "You Clicked the Button"
+async function getNoteTypes() {
+  try{
+    const response = await callBackgroundService('GET-NOTETYPES', { message: "Hello from Popup!" })
+    //Not sure if there is a better way to extract the data than this toString into split
+    const noteTypes = response.toString().split(',')
+    return noteTypes;
+
+  } catch (e) {
+    //If error, re-validate AnkiConnect to see if connection has been lost
+    validateAnkiConnect()
+  }
+}
+
+function setNotetypeSelector(noteTypesArray = [""]){
+  const noteTypeSelector = document.getElementById("note-type")
+  noteTypeSelector.innerHTML = ""
+  for (let noteType of noteTypesArray){
+    const option = document.createElement("option")
+    option.value = noteType
+    option.innerHTML = noteType
+    //TODO: If there is already a notetype saved in the storage, then add selected attribute to said notetype
+    noteTypeSelector.appendChild(option)
+  }
+}
+
+async function onSaveButtonClick(){
+  const noteTypes = await getNoteTypes();
+  setNotetypeSelector(noteTypes);
 }
 
 async function callBackgroundService(action, payload = {}) {
@@ -75,5 +104,6 @@ async function callBackgroundService(action, payload = {}) {
   }
   catch (error) {
     console.log(error.message)
+    throw new Error(error.message)
   }
 }

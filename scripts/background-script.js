@@ -12,6 +12,15 @@ const Actions = {
     console.log(`Test Connection Failed: ${e}`);
     return { response: false }
     }
+  },
+  "GET-NOTETYPES": async (payload) => {
+    try {
+    const result = await ankiConnectInvoke('modelNames', 6);
+    console.log(`Got Note Types: ${result}`)
+    return result
+    } catch (e) {
+    return { error: `Fetching Models Failed: ${e}`}
+    }
   }
 }
 
