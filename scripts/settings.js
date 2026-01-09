@@ -1,8 +1,4 @@
-/*
- * These two functions should be uncommented when ready for deployment, but they're commented for easier testing
- */
-// toggleSettingsVisibility(false)
-// validateAnkiConnect()
+validateAnkiConnect();
 
 document
   .getElementById("model-field")
@@ -28,10 +24,11 @@ async function validateAnkiConnect() {
   const connectButton = document.getElementById("connect-button");
 
   connectButton.style.display = "none";
+  toggleSettingsVisibility(false);
+
   statusMessage.textContent = "Checking Connection...";
   statusMessage.style.color = "blue";
   const response = await callBackgroundService("TEST-CONNECTION");
-  connectButton.style.display = "inline-block";
 
   //response.response returns true if connection is successful
   if (response.response) {
@@ -41,7 +38,7 @@ async function validateAnkiConnect() {
   } else {
     statusMessage.textContent = "Not Connected to Anki";
     statusMessage.style.color = "red";
-    toggleSettingsVisibility(false);
+    connectButton.style.display = "inline-block";
   }
 }
 
