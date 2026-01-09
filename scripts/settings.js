@@ -28,7 +28,7 @@ async function validateAnkiConnect() {
 
   statusMessage.textContent = "Checking Connection...";
   statusMessage.style.color = "blue";
-  const response = await callBackgroundService("TEST-CONNECTION");
+  const response = await callBackgroundService("TEST-ANKICONNECT");
 
   //response.response returns true if connection is successful
   if (response.response) {
@@ -65,7 +65,7 @@ function toggleSettingsVisibility(isVisible) {
 
 async function getModels() {
   try {
-    const response = await callBackgroundService("GET-MODELS");
+    const response = await callBackgroundService("FETCH-ANKI-MODELS");
     //Not sure if there is a better way to extract the data than this toString into split
     const models = response.toString().split(",");
     return models;
@@ -89,7 +89,7 @@ function setModelSelectorOptions(models = [""]) {
 
 async function getFieldNames(model) {
   try {
-    const response = await callBackgroundService("GET-FIELDS", {
+    const response = await callBackgroundService("FETCH-ANKI-FIELDS", {
       modelName: model,
     });
     //Not sure if there is a better way to extract the data than this toString into split

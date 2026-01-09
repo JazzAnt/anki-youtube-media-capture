@@ -3,7 +3,7 @@ import "./browser-polyfill.js";
 browser.runtime.onMessage.addListener(handleMessages);
 
 const Actions = {
-  "TEST-CONNECTION": async () => {
+  "TEST-ANKICONNECT": async () => {
     try {
       const result = await ankiConnectInvoke("version", 6);
       console.log(`Got AnkiConnect Version: ${result}`);
@@ -13,7 +13,7 @@ const Actions = {
       return { response: false };
     }
   },
-  "GET-MODELS": async () => {
+  "FETCH-ANKI-MODELS": async () => {
     try {
       const result = await ankiConnectInvoke("modelNames", 6);
       console.log(`Got Models: ${result}`);
@@ -22,7 +22,7 @@ const Actions = {
       return { error: `Fetching Models Failed: ${e}` };
     }
   },
-  "GET-FIELDS": async (params) => {
+  "FETCH-ANKI-FIELDS": async (params) => {
     try {
       const result = await ankiConnectInvoke("modelFieldNames", 6, params);
       console.log(`Got Field Names: ${result}`);
