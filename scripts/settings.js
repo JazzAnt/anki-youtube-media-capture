@@ -1,5 +1,4 @@
-validateAnkiConnect();
-
+toggleReloadButton(false);
 document
   .getElementById("model-field")
   .addEventListener("input", async function () {
@@ -7,11 +6,23 @@ document
     setFieldSelectorsOptions(fieldNames);
   });
 
+{
+  if (validateAnkiConnect()) {
+    fetchModels();
+  }
+}
+
 var connectButton = document.getElementById("connect-button");
 if (connectButton.addEventListener)
   connectButton.addEventListener("click", validateAnkiConnect, false);
 else if (connectButton.attachEvent)
   connectButton.addEventListener("onclick", validateAnkiConnect);
+
+var reloadButton = document.getElementById("reload-button");
+if (reloadButton.addEventListener)
+  reloadButton.addEventListener("click", fetchModels, false);
+else if (reloadButton.attachEvent)
+  reloadButton.attachEvent("onclick", fetchModels);
 
 var saveButton = document.getElementById("save-button");
 if (saveButton.addEventListener)
@@ -35,10 +46,12 @@ async function validateAnkiConnect() {
     statusMessage.textContent = "Connected to Anki";
     statusMessage.style.color = "green";
     toggleSettingsVisibility(true);
+    return true;
   } else {
     statusMessage.textContent = "Not Connected to Anki";
     statusMessage.style.color = "red";
     connectButton.style.display = "inline-block";
+    return false;
   }
 }
 
@@ -64,14 +77,14 @@ function toggleSettingsVisibility(isVisible) {
 }
 
 async function getModels() {
+  toggleReloadButton(false);
   try {
     const response = await callBackgroundService("FETCH-ANKI-MODELS");
     //Not sure if there is a better way to extract the data than this toString into split
     const models = response.toString().split(",");
     return models;
   } catch (e) {
-    //If error, re-validate AnkiConnect to see if connection has been lost
-    validateAnkiConnect();
+    toggleReloadButton(true, `Error Fetching Models: ${e}`);
   }
 }
 
@@ -88,6 +101,7 @@ function setModelSelectorOptions(models = [""]) {
 }
 
 async function getFieldNames(model) {
+  toggleReloadButton(false);
   try {
     const response = await callBackgroundService("FETCH-ANKI-FIELDS", {
       modelName: model,
@@ -96,8 +110,7 @@ async function getFieldNames(model) {
     const fieldNames = response.toString().split(",");
     return fieldNames;
   } catch (e) {
-    //If error, re-validate AnkiConnect to see if connection has been lost
-    validateAnkiConnect();
+    toggleReloadButton(true, `Error Fetching Fields: ${e}`);
   }
 }
 
@@ -118,10 +131,24 @@ function setFieldSelectorsOptions(fieldsArray = [""]) {
   }
 }
 
-async function onSaveButtonClick() {
-  const models = await getModels();
-  setModelSelectorOptions(models);
+function toggleReloadButton(isVisible, message = "") {
+  document.getElementById("button-message").textContent = message;
+  if (isVisible)
+    document.getElementById("model-fetch-error-container").style.display =
+      "block";
+  else
+    document.getElementById("model-fetch-error-container").style.display =
+      "none";
 }
+
+async function fetchModels() {
+  if (validateAnkiConnect()) {
+    const models = await getModels();
+    setModelSelectorOptions(models);
+  }
+}
+
+async function onSaveButtonClick() {}
 
 async function callBackgroundService(action, params = {}) {
   try {
