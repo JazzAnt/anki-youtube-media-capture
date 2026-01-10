@@ -1,46 +1,34 @@
-toggleReloadButton(false);
-document
-  .getElementById("model-field")
-  .addEventListener("input", async function () {
+document.getElementById("model-field").addEventListener(
+  "input",
+  async function () {
     const fieldNames = await getFieldNames(this.value);
     setFieldSelectorsOptions(fieldNames);
-  });
+  },
+  false
+);
 document
   .getElementById("connect-button")
-  .addEventListener("click", validateAnkiConnect, false);
-document
-  .getElementById("reload-button")
   .addEventListener("click", fetchModels, false);
 document
   .getElementById("save-button")
   .addEventListener("click", onSaveButtonClick, false);
-{
-  if (validateAnkiConnect()) {
-    fetchModels();
-  }
-}
+fetchModels();
+
 
 async function validateAnkiConnect() {
-  const statusMessage = document.getElementById("status-message");
-  const connectButton = document.getElementById("connect-button");
-
-  connectButton.style.display = "none";
+  toggleConnectButton(false);
   toggleSettingsVisibility(false);
+  setConnectionStatus("Checking Connection...", "blue");
 
-  statusMessage.textContent = "Checking Connection...";
-  statusMessage.style.color = "blue";
   const response = await callBackgroundService("TEST-ANKICONNECT");
 
-  //response.response returns true if connection is successful
   if (response.response) {
-    statusMessage.textContent = "Connected to Anki";
-    statusMessage.style.color = "green";
+    setConnectionStatus("Connected to Anki", "green");
     toggleSettingsVisibility(true);
     return true;
   } else {
-    statusMessage.textContent = "Not Connected to Anki";
-    statusMessage.style.color = "red";
-    connectButton.style.display = "inline-block";
+    setConnectionStatus("Failed to Connect to Anki", "red");
+    toggleConnectButton(true);
     return false;
   }
 }
@@ -67,14 +55,15 @@ function toggleSettingsVisibility(isVisible) {
 }
 
 async function getModels() {
-  toggleReloadButton(false);
   try {
     const response = await callBackgroundService("FETCH-ANKI-MODELS");
     //Not sure if there is a better way to extract the data than this toString into split
     const models = response.toString().split(",");
     return models;
   } catch (e) {
-    toggleReloadButton(true, `Error Fetching Models: ${e}`);
+    console.log("getModels Error: " + e);
+    setConnectionStatus("Error Fetching Models", "red");
+    toggleConnectButton(true);
   }
 }
 
@@ -91,16 +80,19 @@ function setModelSelectorOptions(models = [""]) {
 }
 
 async function getFieldNames(model) {
-  toggleReloadButton(false);
   try {
     const response = await callBackgroundService("FETCH-ANKI-FIELDS", {
       modelName: model,
     });
     //Not sure if there is a better way to extract the data than this toString into split
     const fieldNames = response.toString().split(",");
+    setConnectionStatus("Connected to Anki", "green");
+    toggleConnectButton(false);
     return fieldNames;
   } catch (e) {
-    toggleReloadButton(true, `Error Fetching Fields: ${e}`);
+    console.log("getFieldNames Error: " + e);
+    setConnectionStatus("Error Fetching Fields", "red");
+    toggleConnectButton(true);
   }
 }
 
@@ -121,14 +113,16 @@ function setFieldSelectorsOptions(fieldsArray = [""]) {
   }
 }
 
-function toggleReloadButton(isVisible, message = "") {
-  document.getElementById("button-message").textContent = message;
-  if (isVisible)
-    document.getElementById("model-fetch-error-container").style.display =
-      "block";
-  else
-    document.getElementById("model-fetch-error-container").style.display =
-      "none";
+function toggleConnectButton(isVisible, message = "", msgColor = "black") {
+  const connectButton = document.getElementById("connect-button");
+  if (isVisible) connectButton.style.display = "inline-block";
+  else connectButton.style.display = "none";
+}
+
+function setConnectionStatus(message = "", color = "black") {
+  const statusMessage = document.getElementById("status-message");
+  statusMessage.textContent = message;
+  statusMessage.style.color = color;
 }
 
 async function fetchModels() {
