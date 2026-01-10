@@ -3,6 +3,7 @@
   "description": "Captures audio and screenshots from youtube videos",
   "version": "0.1",
   "manifest_version": 3,
+  "permissions": ["storage"],
   "host_permissions": ["http://localhost:8765/*"],
   "icons": {
     "16": "images/icon-16.png",

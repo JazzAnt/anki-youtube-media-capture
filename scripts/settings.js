@@ -1,11 +1,18 @@
 document.getElementById("model-field").addEventListener(
   "input",
   async function () {
+    browser.storage.sync.set({model: this.value})
     const fieldNames = await getFieldNames(this.value);
     setFieldSelectorsOptions(fieldNames);
   },
   false
 );
+document.getElementById("image-field").addEventListener("input", async function() {
+  browser.storage.sync.set({imageField: this.value})
+}, false)
+document.getElementById("audio-field").addEventListener("input", async function() {
+  browser.storage.sync.set({audioField: this.value})
+}, false)
 document
   .getElementById("connect-button")
   .addEventListener("click", fetchModels, false);
@@ -132,7 +139,10 @@ async function fetchModels() {
   }
 }
 
-async function onSaveButtonClick() {}
+async function onSaveButtonClick() {
+  let test = await browser.storage.sync.get()
+  console.log(test)
+}
 
 async function callBackgroundService(action, params = {}) {
   try {
