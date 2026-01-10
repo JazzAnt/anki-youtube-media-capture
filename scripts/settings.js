@@ -5,30 +5,20 @@ document
     const fieldNames = await getFieldNames(this.value);
     setFieldSelectorsOptions(fieldNames);
   });
-
+document
+  .getElementById("connect-button")
+  .addEventListener("click", validateAnkiConnect, false);
+document
+  .getElementById("reload-button")
+  .addEventListener("click", fetchModels, false);
+document
+  .getElementById("save-button")
+  .addEventListener("click", onSaveButtonClick, false);
 {
   if (validateAnkiConnect()) {
     fetchModels();
   }
 }
-
-var connectButton = document.getElementById("connect-button");
-if (connectButton.addEventListener)
-  connectButton.addEventListener("click", validateAnkiConnect, false);
-else if (connectButton.attachEvent)
-  connectButton.addEventListener("onclick", validateAnkiConnect);
-
-var reloadButton = document.getElementById("reload-button");
-if (reloadButton.addEventListener)
-  reloadButton.addEventListener("click", fetchModels, false);
-else if (reloadButton.attachEvent)
-  reloadButton.attachEvent("onclick", fetchModels);
-
-var saveButton = document.getElementById("save-button");
-if (saveButton.addEventListener)
-  saveButton.addEventListener("click", onSaveButtonClick, false);
-else if (saveButton.attachEvent)
-  saveButton.attachEvent("onclick", onSaveButtonClick);
 
 async function validateAnkiConnect() {
   const statusMessage = document.getElementById("status-message");
