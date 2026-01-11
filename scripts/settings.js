@@ -1,149 +1,238 @@
+initialize();
+/**************************************************************************************************
+ * Adding Event Listeners to various UI elements                                                  *
+ **************************************************************************************************/
+document
+  .getElementById("reconnect-button")
+  .addEventListener("click", initialize, false);
 document.getElementById("model-field").addEventListener(
   "input",
   async function () {
-    browser.storage.sync.set({model: this.value})
-    const fieldNames = await getFieldNames(this.value);
-    setFieldSelectorsOptions(fieldNames);
+    try {
+      const success = await setSavedModel(this.value);
+      if (!success) throw new Error("Failed Saving Model");
+      const fieldNames = await getFieldNames(this.value);
+      setImageFieldOptions(fieldNames);
+      setAudioFieldOptions(fieldNames);
+    } catch (e) {
+      handleConnectionFailure(e);
+    }
   },
   false
 );
-document.getElementById("image-field").addEventListener("input", async function() {
-  browser.storage.sync.set({imageField: this.value})
-}, false)
-document.getElementById("audio-field").addEventListener("input", async function() {
-  browser.storage.sync.set({audioField: this.value})
-}, false)
-document
-  .getElementById("connect-button")
-  .addEventListener("click", fetchModels, false);
+document.getElementById("image-field").addEventListener(
+  "input",
+  async function () {
+    const success = await setImageField(this.value);
+    if (!success) handleConnectionFailure("Failed Saving Image Field");
+  },
+  false
+);
+document.getElementById("audio-field").addEventListener(
+  "input",
+  async function () {
+    const success = await setAudioField(this.value);
+    if (!success) handleConnectionFailure("Failed Saving Audio Field");
+  },
+  false
+);
+
+/**
+ * This save button is deprecated (replaced by event listeners) and is currently only kept around for testing
+ */
 document
   .getElementById("save-button")
   .addEventListener("click", onSaveButtonClick, false);
-fetchModels();
+async function onSaveButtonClick() {
+  let test = await browser.storage.sync.get();
+  console.log(test);
+}
 
+/**************************************************************************************************
+ * Complex Functions (Functions which calls several other functions to perform complex actions)   *
+ **************************************************************************************************/
+/**
+ * Function that sets everything up. This function is meant to be called at the very start of the code
+ * and re-called by the reconnect button.
+ * @returns {void}
+ */
+async function initialize() {
+  //disable all input to prevent user input while connection is checked
+  setReconnectBtnVisibility(false);
+  setSelectorsVisibility(false);
 
-async function validateAnkiConnect() {
-  toggleConnectButton(false);
-  toggleSettingsVisibility(false);
-  setConnectionStatus("Checking Connection...", "blue");
+  setStatusMessage("Checking Connection...", "blue");
+  const connected = await getConnectionStatus();
 
-  const response = await callBackgroundService("TEST-ANKICONNECT");
+  if (!connected) {
+    handleConnectionFailure();
+    return;
+  }
 
-  if (response.response) {
-    setConnectionStatus("Connected to Anki", "green");
-    toggleSettingsVisibility(true);
+  setStatusMessage("Connected to Anki", "green");
+  setSelectorsVisibility(true);
+
+  try {
+    const models = await getModels();
+    setModelOptions(models);
+  } catch (_) {
+    handleConnectionFailure();
+    return;
+  }
+
+  //TODO: fetch existing values from storage and set them on the input fields
+}
+
+/**
+ * Function that is meant to be triggered when a connection failure happens. This function displays an error message on
+ * the UI, displays the retry connection button, and disables all other input fields.
+ * @param {string} message An error message to be displayed on the UI. The default message is "Failed to Connect to Anki"
+ */
+function handleConnectionFailure(message = "Failed to Connect to Anki") {
+  setStatusMessage(message, "red");
+  setReconnectBtnVisibility(true);
+  setSelectorsVisibility(false);
+}
+
+/**************************************************************************************************
+ * Storage Functions (Abstracts storage getters and setters to ensure no wrong keys are used)     *
+ **************************************************************************************************/
+/**
+ * Fetches the saved note model from the sync storage area.
+ * @returns {Promise<string>} The saved model, or an empty string if there is none (or if there is an error)
+ */
+async function getSavedModel() {
+  try {
+    const response = await browser.storage.sync.get("model");
+    return response.model;
+  } catch (_) {
+    return "";
+  }
+}
+
+/**
+ * Fetches the saved image field from the sync storage area.
+ * @returns {Promise<string>} The saved image field, or an empty string if there is none (or if there is an error)
+ */
+async function getImageField() {
+  try {
+    const response = await browser.storage.sync.get("imageField");
+    return response.imageField;
+  } catch (_) {
+    return "";
+  }
+}
+
+/**
+ * Fetches the saved audio field from the sync storage area.
+ * @returns {Promise<string>} The saved audio field, or an empty string if there is none (or if there is an error)
+ */
+async function getAudioField() {
+  try {
+    const response = await browser.storage.sync.get("audioField");
+    return response.audioField;
+  } catch (_) {
+    return "";
+  }
+}
+
+/**
+ * Saves the model in the sync storage area. Also deletes the existing field values (by default) because
+ * fields are tied to models so if the saved model is changed then the saved fields won't be compatible with the new model.
+ * @param {string} model
+ * @param {boolean} deleteSavedFields If set to true (which is the default), then this function also deletes all saved fields.
+ * @returns {Promise<boolean>} True if successful and false otherwise.
+ */
+async function setSavedModel(model, deleteSavedFields = true) {
+  try {
+    await browser.storage.sync.set({ model: model });
+    if (deleteSavedFields) {
+      await browser.storage.sync.remove(["imageField", "audioField"]);
+    }
     return true;
-  } else {
-    setConnectionStatus("Failed to Connect to Anki", "red");
-    toggleConnectButton(true);
+  } catch (_) {
     return false;
   }
 }
 
-function toggleSettingsVisibility(isVisible) {
-  const selectors = document.getElementsByClassName("selector-container");
-  const buttons = document.getElementsByClassName("button-container");
-
-  if (isVisible) {
-    for (i = 0; i < selectors.length; i++) {
-      selectors[i].style.display = "flex";
-    }
-    for (i = 0; i < buttons.length; i++) {
-      buttons[i].style.display = "block";
-    }
-  } else {
-    for (i = 0; i < selectors.length; i++) {
-      selectors[i].style.display = "none";
-    }
-    for (i = 0; i < buttons.length; i++) {
-      buttons[i].style.display = "none";
-    }
+/**
+ * Saves the image field in the sync storage area.
+ * @param {string} imageField
+ * @returns {Promise<boolean>} True if successful and false otherwise.
+ */
+async function setImageField(imageField) {
+  try {
+    await browser.storage.sync.set({ imageField: imageField });
+    return true;
+  } catch (_) {
+    return false;
   }
 }
 
+/**
+ * Saves the audio field in the sync storage area.
+ * @param {string} audioField
+ * @returns {Promise<boolean>} True if successful and false otherwise.
+ */
+async function setAudioField(audioField) {
+  try {
+    await browser.storage.sync.set({ audioField: audioField });
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+/**************************************************************************************************
+ * Background Service Calls (Message background-script.js, mostly to receive content)             *
+ **************************************************************************************************/
+/**
+ * Checks if AnkiConnect is connected to the Anki application.
+ * @returns {Promise<boolean>} true if AnkiConnect is connected and false otherwise.
+ */
+async function getConnectionStatus() {
+  const response = await callBackgroundService("TEST-ANKICONNECT");
+  return response.response;
+}
+
+/**
+ * Fetches the model names in the Anki account (also known as note types).
+ * @returns {Promise<Array<string>>} An Array of strings containing the model names.
+ * @throws An Error bubbled from {@link callBackgroundService()}.
+ * The most common error is caused by AnkiConnect not being connected to Anki.
+ */
 async function getModels() {
-  try {
-    const response = await callBackgroundService("FETCH-ANKI-MODELS");
-    //Not sure if there is a better way to extract the data than this toString into split
-    const models = response.toString().split(",");
-    return models;
-  } catch (e) {
-    console.log("getModels Error: " + e);
-    setConnectionStatus("Error Fetching Models", "red");
-    toggleConnectButton(true);
-  }
+  const response = await callBackgroundService("FETCH-ANKI-MODELS");
+  const models = response.toString().split(",");
+  return models;
 }
 
-function setModelSelectorOptions(models = [""]) {
-  const modelSelector = document.getElementById("model-field");
-  modelSelector.innerHTML = "";
-  for (let model of models) {
-    const modelOption = document.createElement("option");
-    modelOption.value = model;
-    modelOption.textContent = model;
-    //TODO: If there is already a notetype saved in the storage, then add selected attribute to said notetype
-    modelSelector.appendChild(modelOption);
-  }
-}
-
+/**
+ * Fetches the field names of a given note model.
+ * @param {string} model The note model whose field names would be requested
+ * (usually retrieved from {@link getModels()}).
+ * @returns {Promise<Array<string>>} An Array of strings containing the field names.
+ * @throws An Error bubbled from {@link callBackgroundService()}.
+ * The most common error is caused by AnkiConnect not being connected to Anki.
+ */
 async function getFieldNames(model) {
-  try {
-    const response = await callBackgroundService("FETCH-ANKI-FIELDS", {
-      modelName: model,
-    });
-    //Not sure if there is a better way to extract the data than this toString into split
-    const fieldNames = response.toString().split(",");
-    setConnectionStatus("Connected to Anki", "green");
-    toggleConnectButton(false);
-    return fieldNames;
-  } catch (e) {
-    console.log("getFieldNames Error: " + e);
-    setConnectionStatus("Error Fetching Fields", "red");
-    toggleConnectButton(true);
-  }
+  const response = await callBackgroundService("FETCH-ANKI-FIELDS", {
+    modelName: model,
+  });
+  const fieldNames = response.toString().split(",");
+  return fieldNames;
 }
 
-function setFieldSelectorsOptions(fieldsArray = [""]) {
-  const imageFieldSelector = document.getElementById("image-field");
-  const audioFieldSelector = document.getElementById("audio-field");
-
-  imageFieldSelector.innerHTML = "";
-  audioFieldSelector.innerHTML = "";
-
-  for (let field of fieldsArray) {
-    const fieldOption = document.createElement("option");
-    fieldOption.value = field;
-    fieldOption.textContent = field;
-    //TODO if there are values saved in the storage, add selected to appropriate options
-    imageFieldSelector.appendChild(fieldOption);
-    audioFieldSelector.appendChild(fieldOption.cloneNode(true));
-  }
-}
-
-function toggleConnectButton(isVisible, message = "", msgColor = "black") {
-  const connectButton = document.getElementById("connect-button");
-  if (isVisible) connectButton.style.display = "inline-block";
-  else connectButton.style.display = "none";
-}
-
-function setConnectionStatus(message = "", color = "black") {
-  const statusMessage = document.getElementById("status-message");
-  statusMessage.textContent = message;
-  statusMessage.style.color = color;
-}
-
-async function fetchModels() {
-  if (validateAnkiConnect()) {
-    const models = await getModels();
-    setModelSelectorOptions(models);
-  }
-}
-
-async function onSaveButtonClick() {
-  let test = await browser.storage.sync.get()
-  console.log(test)
-}
-
+/**
+ * Messages the background service to request an action and a response.
+ * Check background-script.js to see in detail what actions are available and what content they return.
+ * NOTE: This function is usually not called directly by any UI-attached function.
+ * Rather, all relevant actions should already have a function that abstracts them.
+ * @param {string} action An action to be performed by the background service.
+ * @param {object} params Some actions requires certain parameters (as key-value pairs) to be inputted.
+ * @returns {Promise} Content from the background service (depends on the action requested)
+ * @throws An Error if the requested action responds with an error or if the requested action doesn't exist.
+ * @example let response = await callBackgroundService("ACTION", {param1: "lorem", param2: "ipsum"});
+ */
 async function callBackgroundService(action, params = {}) {
   try {
     const response = await browser.runtime.sendMessage({
@@ -152,11 +241,94 @@ async function callBackgroundService(action, params = {}) {
     });
 
     if (response && response.error) {
-      throw new Error(`Background Script Error: ${response.error}`);
+      throw new Error(`callBackgroundService Error: ${response.error}`);
     }
     return response;
   } catch (error) {
     console.log(error.message);
     throw new Error(error.message);
+  }
+}
+
+/**************************************************************************************************
+ * UI Functions (Modify UI Elements)                                                              *
+ **************************************************************************************************/
+
+/**
+ * Set whether the 'retry connection' button is displayed on the UI or not.
+ * @param {boolean} isVisible If true makes the button visible on the UI.
+ */
+function setReconnectBtnVisibility(isVisible) {
+  const connectButton = document.getElementById("reconnect-button");
+  if (isVisible) connectButton.style.display = "inline-block";
+  else connectButton.style.display = "none";
+}
+
+/**
+ * Sets the message displayed on the top of the UI, which is primarily meant to display connection status and errors.
+ * @param {string} message The message displayed.
+ * @param {string} color The color of the message (must be compatible with CSS color styling e.g. "red" or "blue").
+ * @example setStatusMessage("Connection OK", "green");
+ */
+function setStatusMessage(message, color = "darkgreen") {
+  const statusMessage = document.getElementById("status-message");
+  statusMessage.textContent = message;
+  statusMessage.style.color = color;
+}
+
+/**
+ * Sets whether the selectors are displayed on the UI or not.
+ * @param {boolean} isVisible If true, selectors are displayed on the UI.
+ */
+function setSelectorsVisibility(isVisible) {
+  const selectors = document.getElementsByClassName("selector-container");
+
+  if (isVisible)
+    for (i = 0; i < selectors.length; i++) selectors[i].style.display = "flex";
+  else for (i = 0; i < selectors.length; i++) selectors[i].style.display = "none";
+}
+
+/**
+ * Sets the options on the model selector input field. Replaces any existing options.
+ * @param {Array<string>} models An array of the models to be used as the selector options.
+ */
+function setModelOptions(models) {
+  const modelSelector = document.getElementById("model-field");
+  modelSelector.innerHTML = "";
+  for (let model of models) {
+    const modelOption = document.createElement("option");
+    modelOption.value = model;
+    modelOption.textContent = model;
+    modelSelector.appendChild(modelOption);
+  }
+}
+
+/**
+ * Sets the options on the image selector input field. Replaces any existing options.
+ * @param {Array<string>} models An array of the fields to be used as the selector options.
+ */
+function setImageFieldOptions(fieldsArray) {
+  const imageFieldSelector = document.getElementById("image-field");
+  imageFieldSelector.innerHTML = "";
+  for (let field of fieldsArray) {
+    const fieldOption = document.createElement("option");
+    fieldOption.value = field;
+    fieldOption.textContent = field;
+    imageFieldSelector.appendChild(fieldOption);
+  }
+}
+
+/**
+ * Sets the options on the audio selector input field. Replaces any existing options.
+ * @param {Array<string>} models An array of the fields to be used as the selector options.
+ */
+function setAudioFieldOptions(fieldsArray) {
+  const audioFieldSelector = document.getElementById("audio-field");
+  audioFieldSelector.innerHTML = "";
+  for (let field of fieldsArray) {
+    const fieldOption = document.createElement("option");
+    fieldOption.value = field;
+    fieldOption.textContent = field;
+    audioFieldSelector.appendChild(fieldOption);
   }
 }
