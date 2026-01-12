@@ -191,7 +191,7 @@ async function setAudioField(audioField) {
  */
 async function getConnectionStatus() {
   const response = await callBackgroundService("TEST-ANKICONNECT");
-  return response.response;
+  return response;
 }
 
 /**

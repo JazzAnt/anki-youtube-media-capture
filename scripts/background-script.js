@@ -8,7 +8,7 @@ browser.runtime.onMessage.addListener(handleMessages);
 const Actions = {
   /**
    * Tests connectivity to AnkiConnect, which is done by making a simple API call to ask AnkiConnect for it's current version.
-   * @returns True if connection is successful and false otherwise.
+   * @returns {Promise<boolean>} True if connection is successful and false otherwise.
    */
   "TEST-ANKICONNECT": async () => {
     try {
@@ -16,10 +16,12 @@ const Actions = {
       console.log(
         `TEST-ANKICONNECT action success!\nResult\t: AnkiConnect Version ${result}`
       );
-      return { response: true };
+      return true;
     } catch (e) {
-      console.log(`TEST-ANKICONNECT action failure!\nError\t: ${e}`);
-      return { response: false };
+      console.log(
+        `TEST-ANKICONNECT action success!\nResult\t: Connection Failure with ${e}`
+      );
+      return false;
     }
   },
   /**
@@ -120,7 +122,6 @@ async function ankiConnectInvoke(action, version, params = {}) {
     if (json.error) {
       throw json.error;
     }
-    console.log(typeof json.result);
     return json.result;
   } catch (error) {
     throw new Error(`AnkiConnect Error: ${error}`);
