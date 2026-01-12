@@ -201,8 +201,7 @@ async function getConnectionStatus() {
  * The most common error is caused by AnkiConnect not being connected to Anki.
  */
 async function getModels() {
-  const response = await callBackgroundService("FETCH-ANKI-MODELS");
-  const models = response.toString().split(",");
+  const models = await callBackgroundService("FETCH-ANKI-MODELS");
   return models;
 }
 
@@ -215,10 +214,9 @@ async function getModels() {
  * The most common error is caused by AnkiConnect not being connected to Anki.
  */
 async function getFieldNames(model) {
-  const response = await callBackgroundService("FETCH-ANKI-FIELDS", {
+  const fieldNames = await callBackgroundService("FETCH-ANKI-FIELDS", {
     modelName: model,
   });
-  const fieldNames = response.toString().split(",");
   return fieldNames;
 }
 
