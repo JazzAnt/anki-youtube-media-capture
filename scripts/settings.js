@@ -9,11 +9,18 @@ document.getElementById("model-field").addEventListener(
   "input",
   async function () {
     try {
-      const success = await setSavedModel(this.value);
+      let success = await setSavedModel(this.value);
       if (!success) throw new Error("Failed Saving Model");
+
       const fieldNames = await getFieldNames(this.value);
       setImageFieldOptions(fieldNames);
       setAudioFieldOptions(fieldNames);
+
+      success = setSavedImageField(fieldNames[0]);
+      if (!success) throw new Error("Failed Saving Image Field");
+
+      success = setSavedAudioField(fieldNames[0]);
+      if (!success) throw new Error("Failed Saving Audio Field");
     } catch (e) {
       handleConnectionFailure(e);
     }
@@ -23,7 +30,7 @@ document.getElementById("model-field").addEventListener(
 document.getElementById("image-field").addEventListener(
   "input",
   async function () {
-    const success = await setImageField(this.value);
+    const success = await setSavedImageField(this.value);
     if (!success) handleConnectionFailure("Failed Saving Image Field");
   },
   false
@@ -31,7 +38,7 @@ document.getElementById("image-field").addEventListener(
 document.getElementById("audio-field").addEventListener(
   "input",
   async function () {
-    const success = await setAudioField(this.value);
+    const success = await setSavedAudioField(this.value);
     if (!success) handleConnectionFailure("Failed Saving Audio Field");
   },
   false
@@ -181,7 +188,7 @@ async function setSavedModel(model, deleteSavedFields = true) {
  * @param {string} imageField
  * @returns {Promise<boolean>} True if successful and false otherwise.
  */
-async function setImageField(imageField) {
+async function setSavedImageField(imageField) {
   try {
     await browser.storage.sync.set({ imageField: imageField });
     return true;
@@ -195,7 +202,7 @@ async function setImageField(imageField) {
  * @param {string} audioField
  * @returns {Promise<boolean>} True if successful and false otherwise.
  */
-async function setAudioField(audioField) {
+async function setSavedAudioField(audioField) {
   try {
     await browser.storage.sync.set({ audioField: audioField });
     return true;
