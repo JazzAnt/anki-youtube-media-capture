@@ -80,7 +80,28 @@ async function initialize() {
     return;
   }
 
-  //TODO: fetch existing values from storage and set them on the input fields
+  const savedModel = await getSavedModel();
+  if (savedModel) {
+    setModelSelected(savedModel);
+    try {
+      const fieldNames = await getFieldNames(savedModel);
+      setImageFieldOptions(fieldNames);
+      setAudioFieldOptions(fieldNames);
+
+      const savedImageField = await getSavedImageField();
+      if (savedImageField) {
+        setImageFieldSelected(savedImageField);
+      }
+
+      const savedAudioField = await getSavedAudioField();
+      if (savedAudioField) {
+        setAudioFieldSelected(savedAudioField);
+      }
+    } catch (_) {
+      handleConnectionFailure();
+      return;
+    }
+  }
 }
 
 /**
@@ -99,40 +120,40 @@ function handleConnectionFailure(message = "Failed to Connect to Anki") {
  **************************************************************************************************/
 /**
  * Fetches the saved note model from the sync storage area.
- * @returns {Promise<string>} The saved model, or an empty string if there is none (or if there is an error)
+ * @returns {Promise<string>} The saved model, or undefined if there is none (or if there is an error)
  */
 async function getSavedModel() {
   try {
     const response = await browser.storage.sync.get("model");
     return response.model;
   } catch (_) {
-    return "";
+    return undefined;
   }
 }
 
 /**
  * Fetches the saved image field from the sync storage area.
- * @returns {Promise<string>} The saved image field, or an empty string if there is none (or if there is an error)
+ * @returns {Promise<string>} The saved image field, or undefined if there is none (or if there is an error)
  */
-async function getImageField() {
+async function getSavedImageField() {
   try {
     const response = await browser.storage.sync.get("imageField");
     return response.imageField;
   } catch (_) {
-    return "";
+    return undefined;
   }
 }
 
 /**
  * Fetches the saved audio field from the sync storage area.
- * @returns {Promise<string>} The saved audio field, or an empty string if there is none (or if there is an error)
+ * @returns {Promise<string>} The saved audio field, or undefined if there is none (or if there is an error)
  */
-async function getAudioField() {
+async function getSavedAudioField() {
   try {
     const response = await browser.storage.sync.get("audioField");
     return response.audioField;
   } catch (_) {
-    return "";
+    return undefined;
   }
 }
 
@@ -283,7 +304,8 @@ function setSelectorsVisibility(isVisible) {
 
   if (isVisible)
     for (i = 0; i < selectors.length; i++) selectors[i].style.display = "flex";
-  else for (i = 0; i < selectors.length; i++) selectors[i].style.display = "none";
+  else
+    for (i = 0; i < selectors.length; i++) selectors[i].style.display = "none";
 }
 
 /**
@@ -328,5 +350,49 @@ function setAudioFieldOptions(fieldsArray) {
     fieldOption.value = field;
     fieldOption.textContent = field;
     audioFieldSelector.appendChild(fieldOption);
+  }
+}
+
+/**
+ * Sets a specific option in the model selector to be selected. If none are found then nothing happens.
+ * @param {string} model The Model option to be selected.
+ */
+function setModelSelected(model) {
+  const selector = document.getElementById("model-field");
+  const options = selector.getElementsByTagName("option");
+
+  //could be more efficient if I return the function the moment a match is found
+  //but I did it this way to ensure all the non-selected one are selected=false
+  for (i = 0; i < options.length; i++) {
+    if (options[i].value == model) options[i].selected = true;
+    else options[i].selected = false;
+  }
+}
+
+/**
+ * Sets a specific option in the image field selector to be selected. If none are found then nothing happens.
+ * @param {string} imageField The Image Field option to be selected.
+ */
+function setImageFieldSelected(imageField) {
+  const selector = document.getElementById("image-field");
+  const options = selector.getElementsByTagName("option");
+
+  for (i = 0; i < options.length; i++) {
+    if (options[i].value == imageField) options[i].selected = true;
+    else options[i].selected = false;
+  }
+}
+
+/**
+ * Sets a specific option in the audio field selector to be selected. If none are found then nothing happens.
+ * @param {string} audioField The Audio Field option to be selected.
+ */
+function setAudioFieldSelected(audioField) {
+  const selector = document.getElementById("audio-field");
+  const options = selector.getElementsByTagName("option");
+
+  for (i = 0; i < options.length; i++) {
+    if (options[i].value == audioField) options[i].selected = true;
+    else options[i].selected = false;
   }
 }
