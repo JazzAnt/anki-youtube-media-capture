@@ -72,3 +72,44 @@ body {
 #button-message {
   color: red;
 }
+
+.tooltip {
+  visibility: hidden;
+  position: absolute;
+  background-color: wheat;
+  border-radius: 5px;
+  border: 2px black solid;
+  padding: 3px;
+  margin-top: -4px;
+  margin-left: 8px;
+  margin-right: 8px;
+  text-align: justify;
+  z-index: 1;
+  box-shadow: 3px 3px 5px black;
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: 25%;
+  right: 100%;
+  margin-top: -5px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent black transparent transparent;
+  z-index: 1;
+}
+
+.has-tooltip:hover .tooltip {
+  visibility: visible;
+}
+
+footer {
+  text-align: end;
+  opacity: 80%;
+}
+
+footer a {
+  text-decoration: none;
+  color: darkblue;
+}

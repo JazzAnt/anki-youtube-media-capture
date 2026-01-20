@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -11,40 +11,69 @@
       <h1 class="title">Anki Youtube Media Capture</h1>
       <img src="../images/icon-128.png" alt="icon" class="title-icon" />
     </div>
+
     <div class="status-container">
       <p id="status-message">Lorem ipsum, dolor sit amet</p>
       <button type="button" id="reconnect-button">Retry Connection</button>
     </div>
+
     <div class="selector-container">
-      <label for="model-field" class="selector-label">Note Model</label>
+      <label for="model-field" class="selector-label has-tooltip"
+        >Note Model
+        <span class="tooltip"
+          >The captured media will be saved to the newest added note of this
+          note model</span
+        >
+      </label>
       <label for="model-field" class="selector-colon">:</label>
       <select name="model-field" id="model-field" class="selector"></select>
     </div>
+
     <div class="selector-container">
-      <label for="image-field" class="selector-label">Image Field</label>
+      <label for="image-field" class="selector-label has-tooltip"
+        >Image Field
+        <span class="tooltip"
+          >Captured screenshot will be stored on this field</span
+        >
+      </label>
       <label for="image-field" class="selector-colon">:</label>
       <select name="image-field" id="image-field" class="selector"></select>
     </div>
+
     <div class="selector-container">
-      <label for="image-shortcut-field" class="selector-label">Image Shortcut</label>
+      <label for="image-shortcut-field" class="selector-label has-tooltip"
+        >Image Shortcut
+        <span class="tooltip">Shortcut key to trigger take screenshot</span>
+      </label>
       <label for="image-shortcut-field" class="selector-colon">:</label>
-      <input type="text" id="image-shortcut-field" class="shortcut"/>
+      <input type="text" id="image-shortcut-field" class="shortcut" />
     </div>
+
     <div class="selector-container">
-      <label for="audio-field" class="selector-label">Audio Field</label>
+      <label for="audio-field" class="selector-label has-tooltip"
+        >Audio Field
+        <span class="tooltip">Recorded audio will be stored on this field</span>
+      </label>
       <label for="audio-field" class="selector-colon">:</label>
       <select name="audio-field" id="audio-field" class="selector"></select>
     </div>
+
     <div class="selector-container">
-      <label for="audio-shortcut-field" class="selector-label">Audio Shortcut</label>
+      <label for="audio-shortcut-field" class="selector-label has-tooltip"
+        >Audio Shortcut
+        <span class="tooltip"
+          >Shortcut key to trigger start/stop audio recording</span
+        >
+      </label>
       <label for="audio-shortcut-field" class="selector-colon">:</label>
-      <input type="text" id="audio-shortcut-field" class="shortcut"/>
-    </div>
-    <div class="button-container">
-      <button type="button" id="save-button">Save Changes</button>
+      <input type="text" id="audio-shortcut-field" class="shortcut" />
     </div>
 
     <script src="../scripts/browser-polyfill.js"></script>
     <script src="../scripts/settings.js"></script>
   </body>
+  <footer>
+    Created by
+    <a href="https://github.com/JazzAnt" target="_blank">JazzAnt</a>
+  </footer>
 </html>
