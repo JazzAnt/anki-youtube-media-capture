@@ -5,7 +5,8 @@
 }
 
 body {
-  width: 300px;
+  width: fit-content;
+  min-width: 300px;
   padding: 1px 3px;
 }
 
@@ -13,19 +14,20 @@ body {
   border: 4px solid darkred;
   display: flex;
   align-items: center;
+  text-align: center;
 }
 
 .title {
   border: 4px solid darkblue;
   text-align: center;
   padding-right: 10px;
-  flex-wrap: 1;
+  flex-grow: 1;
 }
 
 .title-icon {
   border: 4px solid darkgreen;
-  height: 72px;
-  width: 72px;
+  height: 64px;
+  width: 64;
 }
 
 .status-container {
@@ -42,7 +44,7 @@ body {
   border: 4px solid blue;
   text-align: right;
   font-weight: 700;
-  width: 75px;
+  width: 100px;
 }
 
 .selector-colon {
@@ -54,6 +56,11 @@ body {
 
 .selector {
   border: 4px solid green;
+  flex-grow: 1;
+}
+
+.shortcut {
+  border: 4px solid pink;
   flex-grow: 1;
 }
 
