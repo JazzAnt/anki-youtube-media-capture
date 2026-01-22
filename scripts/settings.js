@@ -5,6 +5,10 @@ import {
   setSavedImageField,
   getSavedAudioField,
   setSavedAudioField,
+  getSavedImageShortcut,
+  setSavedImageShortcut,
+  getSavedAudioShortcut,
+  setSavedAudioShortcut,
 } from "./utils/storage.js";
 
 import {
@@ -67,6 +71,7 @@ document.getElementById(SettingsID.imageShortcutField).addEventListener(
     const keyListener = (keyPress) => {
       this.disabled = true;
       this.value = keyPress.code;
+      setSavedImageShortcut(keyPress.code);
       this.disabled = false;
     };
 
@@ -84,6 +89,7 @@ document.getElementById(SettingsID.audioShortcutField).addEventListener(
     const keyListener = (keyPress) => {
       this.disabled = true;
       this.value = keyPress.code;
+      setSavedAudioShortcut(keyPress.code);
       this.disabled = false;
     };
 
@@ -149,6 +155,18 @@ async function initialize() {
       return;
     }
   }
+
+  try {
+    const savedImageShortcut = await getSavedImageShortcut();
+    document.getElementById(SettingsID.imageShortcutField).value =
+      savedImageShortcut;
+    const savedAudioShortcut = await getSavedAudioShortcut();
+    document.getElementById(SettingsID.audioShortcutField).value =
+      savedAudioShortcut;
+  } catch (_) {
+    handleConnectionFailure();
+    return;
+  }
 }
 
 /**
@@ -193,7 +211,9 @@ function setStatusMessage(message, color = "darkgreen") {
  * @param {boolean} isVisible If true, selectors are displayed on the UI.
  */
 function setSelectorsVisibility(isVisible) {
-  const selectors = document.getElementsByClassName(SettingsID.selectorContainerClass);
+  const selectors = document.getElementsByClassName(
+    SettingsID.selectorContainerClass,
+  );
 
   if (isVisible)
     for (let i = 0; i < selectors.length; i++)
