@@ -25,7 +25,7 @@ document.getElementById("model-field").addEventListener(
       handleConnectionFailure(e);
     }
   },
-  false
+  false,
 );
 document.getElementById("image-field").addEventListener(
   "input",
@@ -33,7 +33,7 @@ document.getElementById("image-field").addEventListener(
     const success = await setSavedImageField(this.value);
     if (!success) handleConnectionFailure("Failed Saving Image Field");
   },
-  false
+  false,
 );
 document.getElementById("audio-field").addEventListener(
   "input",
@@ -41,19 +41,42 @@ document.getElementById("audio-field").addEventListener(
     const success = await setSavedAudioField(this.value);
     if (!success) handleConnectionFailure("Failed Saving Audio Field");
   },
-  false
+  false,
 );
 
-/**
- * This save button is deprecated (replaced by event listeners) and is currently only kept around for testing
- */
-document
-  .getElementById("save-button")
-  .addEventListener("click", onSaveButtonClick, false);
-async function onSaveButtonClick() {
-  let test = await browser.storage.sync.get();
-  console.log(test);
-}
+document.getElementById("image-shortcut-field").addEventListener(
+  "focusin",
+  async function () {
+    const keyListener = (keyPress) => {
+      this.disabled = true;
+      this.value = keyPress.code;
+      this.disabled = false;
+    };
+
+    this.addEventListener("keydown", keyListener);
+    this.addEventListener("focusout", () => {
+      this.removeEventListener("keydown", keyListener);
+    });
+  },
+  false,
+);
+
+document.getElementById("audio-shortcut-field").addEventListener(
+  "focusin",
+  async function () {
+    const keyListener = (keyPress) => {
+      this.disabled = true;
+      this.value = keyPress.code;
+      this.disabled = false;
+    };
+
+    this.addEventListener("keydown", keyListener);
+    this.addEventListener("focusout", () => {
+      this.removeEventListener("keydown", keyListener);
+    });
+  },
+  false,
+);
 
 /**************************************************************************************************
  * Complex Functions (Functions which calls several other functions to perform complex actions)   *
