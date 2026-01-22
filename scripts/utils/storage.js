@@ -1,6 +1,9 @@
 /**************************************************************************************************
  * Storage Functions (Abstracts storage getters and setters to ensure no wrong keys are used)     *
  **************************************************************************************************/
+/**************************************************************************************************
+ * GETTERS                                                                                        *
+ **************************************************************************************************/
 /**
  * Fetches the saved note model from the sync storage area.
  * @returns {Promise<string>} The saved model, or undefined if there is none (or if there is an error)
@@ -40,6 +43,41 @@ export async function getSavedAudioField() {
   }
 }
 
+/**
+ * Fetches the saved image shortcut from the sync storage area.
+ * @returns {Promise<string>} The saved image shortcut, or undefined if there is none (or if there is an error).
+ * The image shortcut has a default value of BracketLeft if none had been set.
+ */
+export async function getSavedImageShortcut() {
+  try {
+    const response = await browser.storage.sync.get({
+      imageShortcut: "BracketLeft",
+    });
+    return response.imageShortcut;
+  } catch (_) {
+    return undefined;
+  }
+}
+
+/**
+ * Fetches the saved audio shortcut from the sync storage area.
+ * @returns {Promise<string>} The saved audio shortcut, or undefined if there is none (or if there is an error).
+ * The image shortcut has a default value of BracketRight if none had been set.
+ */
+export async function getSavedAudioShortcut() {
+  try {
+    const response = await browser.storage.sync.get({
+      audioShortcut: "BracketRight",
+    });
+    return response.audioShortcut;
+  } catch (_) {
+    return undefined;
+  }
+}
+
+/**************************************************************************************************
+ * SETTERS                                                                                        *
+ **************************************************************************************************/
 /**
  * Saves the model in the sync storage area. Also deletes the existing field values (by default) because
  * fields are tied to models so if the saved model is changed then the saved fields won't be compatible with the new model.
@@ -81,6 +119,34 @@ export async function setSavedImageField(imageField) {
 export async function setSavedAudioField(audioField) {
   try {
     await browser.storage.sync.set({ audioField: audioField });
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Saves the image shortcut in the sync storage area.
+ * @param {string} imageShortcut
+ * @returns {Promise<boolean>} True if successful and false otherwise.
+ */
+export async function setSavedImageShortcut(imageShortcut) {
+  try {
+    await browser.storage.sync.set({ imageShortcut: imageShortcut });
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Saves the audio shortcut in the sync storage area.
+ * @param {string} audioShortcut
+ * @returns {Promise<boolean>} True if successful and false otherwise.
+ */
+export async function setSavedAudioShortcut(audioShortcut) {
+  try {
+    await browser.storage.sync.set({ audioShortcut: audioShortcut });
     return true;
   } catch (_) {
     return false;
