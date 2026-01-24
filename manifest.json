@@ -22,7 +22,18 @@
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/watch?v=*"],
-      "js": ["scripts/browser-polyfill.js", "scripts/control-buttons.js"]
+      "js": ["scripts/browser-polyfill.js", "scripts/content-script.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "resources": [
+        "scripts/control-buttons.js",
+        "scripts/utils/storage.js",
+        "scripts/namespaces/icons.js",
+        "scripts/namespaces/control-btn-id.js"
+      ]
     }
   ]
 }

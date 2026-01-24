@@ -1,5 +1,6 @@
-import ControlBtnID from "./namespaces/control-btn-id";
-import Icons from "./namespaces/icons";
+import {getSavedImageShortcut, getSavedAudioShortcut} from "./utils/storage.js"
+import ControlBtnID from "./namespaces/control-btn-id.js";
+import Icons from "./namespaces/icons.js";
 
 initialize();
 /**************************************************************************************************
@@ -9,7 +10,7 @@ initialize();
  * Starts or restarts the control buttons on youtube. Should be called at the start of the code and
  * when a reload extensions button is clicked.
  */
-function initialize() {
+async function initialize() {
   resetRootContainer();
 
   //check presence necessary storage variables
@@ -18,9 +19,15 @@ function initialize() {
   //check anki connection
   //if no, show reload button and return
 
-  insertButton(createStopRecordBtn());
-  insertButton(createStartRecordBtn());
-  insertButton(createScreenshotBtn());
+  let [screenshotBtn, startRecordBtn, stopRecordBtn] = await Promise.all([
+    createScreenshotBtn(),
+    createStartRecordBtn(),
+    createStopRecordBtn(),
+  ])
+
+  insertButton(stopRecordBtn);
+  insertButton(startRecordBtn);
+  insertButton(screenshotBtn);
 }
 
 /**************************************************************************************************
@@ -60,9 +67,8 @@ function resetRootContainer() {
  * Creates a screenshot button HTML element.
  * @returns The button element, ready to be inserted to any other HTML container.
  */
-function createScreenshotBtn() {
-  //TODO: key should be obtained from storage and set by the user in settings
-  var shortcut_key = "q";
+async function createScreenshotBtn() {
+  var shortcut_key = await getSavedImageShortcut();
   const screenshotBtn = createButtonWithAttributes(
     ControlBtnID.screenshotBtn,
     "Take Screenshot",
@@ -99,9 +105,8 @@ function takeScreenshot() {
  * Creates a start recording audio button HTML element.
  * @returns The button element, ready to be inserted to any other HTML container.
  */
-function createStartRecordBtn() {
-  //TODO: key should be obtained from storage and set by the user in settings
-  var shortcut_key = "w";
+async function createStartRecordBtn() {
+  var shortcut_key = await getSavedAudioShortcut();
   const startRecordBtn = createButtonWithAttributes(
     ControlBtnID.startRecordBtn,
     "Start Audio Recording",
@@ -117,9 +122,8 @@ function createStartRecordBtn() {
  * displayed and it meant to be toggled on and off using {@link toggleRecordBtnDisplay()}
  * @returns The button element, ready to be inserted to any other HTML container.
  */
-function createStopRecordBtn() {
-  //TODO: key should be obtained from storage and set by the user in settings
-  var shortcut_key = "w";
+async function createStopRecordBtn() {
+  var shortcut_key = await getSavedAudioShortcut();
   const stopRecordBtn = createButtonWithAttributes(
     ControlBtnID.stopRecordBtn,
     "Stop Audio Recording",
@@ -220,7 +224,7 @@ function createButtonWithAttributes(
   button.setAttribute("aria-keyshortcuts", tooltipShortcutKey);
   button.setAttribute(
     "title",
-    tooltipName + " keyboard shortcut (" + tooltipShortcutKey + ")"
+    tooltipName + " (keyboard shortcut [" + tooltipShortcutKey + "])"
   );
   button.setAttribute(
     "aria-label",
