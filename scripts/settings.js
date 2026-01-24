@@ -156,17 +156,12 @@ async function initialize() {
     }
   }
 
-  try {
-    const savedImageShortcut = await getSavedImageShortcut();
-    document.getElementById(SettingsID.imageShortcutField).value =
-      savedImageShortcut;
-    const savedAudioShortcut = await getSavedAudioShortcut();
-    document.getElementById(SettingsID.audioShortcutField).value =
-      savedAudioShortcut;
-  } catch (_) {
-    handleConnectionFailure();
-    return;
-  }
+  const savedImageShortcut = await getSavedImageShortcut();
+  document.getElementById(SettingsID.imageShortcutField).value =
+    savedImageShortcut;
+  const savedAudioShortcut = await getSavedAudioShortcut();
+  document.getElementById(SettingsID.audioShortcutField).value =
+    savedAudioShortcut;
 }
 
 /**

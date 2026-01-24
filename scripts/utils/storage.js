@@ -45,8 +45,8 @@ export async function getSavedAudioField() {
 
 /**
  * Fetches the saved image shortcut from the sync storage area.
- * @returns {Promise<string>} The saved image shortcut, or undefined if there is none (or if there is an error).
- * The image shortcut has a default value of BracketLeft if none had been set.
+ * @returns {Promise<string>} The saved image shortcut. If none has been set, or an error occurs, 
+ * this defaults to returning "BracketLeft".
  */
 export async function getSavedImageShortcut() {
   try {
@@ -55,14 +55,14 @@ export async function getSavedImageShortcut() {
     });
     return response.imageShortcut;
   } catch (_) {
-    return undefined;
+    return "BracketLeft";
   }
 }
 
 /**
  * Fetches the saved audio shortcut from the sync storage area.
- * @returns {Promise<string>} The saved audio shortcut, or undefined if there is none (or if there is an error).
- * The image shortcut has a default value of BracketRight if none had been set.
+ * @returns {Promise<string>} The saved audio shortcut. If none has been set, or an error occurs, 
+ * this defaults to returning "BracketRight". 
  */
 export async function getSavedAudioShortcut() {
   try {
@@ -71,7 +71,7 @@ export async function getSavedAudioShortcut() {
     });
     return response.audioShortcut;
   } catch (_) {
-    return undefined;
+    return "BracketRight";
   }
 }
 
