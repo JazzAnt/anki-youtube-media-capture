@@ -30,9 +30,10 @@
       "matches": ["*://*.youtube.com/*"],
       "resources": [
         "scripts/control-buttons.js",
+        "scripts/utils/action-calls.js",
         "scripts/utils/storage.js",
-        "scripts/namespaces/icons.js",
-        "scripts/namespaces/control-btn-id.js"
+        "scripts/namespaces/control-btn-id.js",
+        "scripts/namespaces/icons.js"
       ]
     }
   ]

@@ -1,4 +1,11 @@
-import {getSavedImageShortcut, getSavedAudioShortcut} from "./utils/storage.js"
+import { getConnectionStatus } from "./utils/action-calls.js";
+import {
+  getSavedModel,
+  getSavedImageField,
+  getSavedImageShortcut,
+  getSavedAudioField,
+  getSavedAudioShortcut,
+} from "./utils/storage.js";
 import ControlBtnID from "./namespaces/control-btn-id.js";
 import Icons from "./namespaces/icons.js";
 
@@ -13,17 +20,26 @@ initialize();
 async function initialize() {
   resetRootContainer();
 
-  //check presence necessary storage variables
-  //if doesn't exist, show error button and return (error button displays error message)
+  //if not connected to Anki, don't show buttons
+  const connected = await getConnectionStatus();
+  if (!connected) return;
 
-  //check anki connection
-  //if no, show reload button and return
+  //check presence of necessary storage variables
+  let [model, imageField, audioField] = await Promise.all([
+    getSavedModel(),
+    getSavedImageField(),
+    getSavedAudioField(),
+  ]);
+  if (!model || !imageField || !audioField) {
+    insertButton(createErrorBtn());
+    return;
+  }
 
   let [screenshotBtn, startRecordBtn, stopRecordBtn] = await Promise.all([
     createScreenshotBtn(),
     createStartRecordBtn(),
     createStopRecordBtn(),
-  ])
+  ]);
 
   insertButton(stopRecordBtn);
   insertButton(startRecordBtn);
@@ -72,7 +88,7 @@ async function createScreenshotBtn() {
   const screenshotBtn = createButtonWithAttributes(
     ControlBtnID.screenshotBtn,
     "Take Screenshot",
-    shortcut_key
+    shortcut_key,
   );
   screenshotBtn.append(createDomElement(Icons.screenshot));
   screenshotBtn.addEventListener("click", takeScreenshot);
@@ -110,7 +126,7 @@ async function createStartRecordBtn() {
   const startRecordBtn = createButtonWithAttributes(
     ControlBtnID.startRecordBtn,
     "Start Audio Recording",
-    shortcut_key
+    shortcut_key,
   );
   startRecordBtn.append(createDomElement(Icons.start_recording_audio));
   startRecordBtn.addEventListener("click", startRecording);
@@ -128,7 +144,7 @@ async function createStopRecordBtn() {
     ControlBtnID.stopRecordBtn,
     "Stop Audio Recording",
     shortcut_key,
-    false
+    false,
   );
   stopRecordBtn.append(createDomElement(Icons.stop_recording_audio));
   stopRecordBtn.addEventListener("click", stopRecording);
@@ -182,6 +198,25 @@ function stopRecording() {
 }
 
 /**************************************************************************************************
+ * Error Button Functions                                                                         *
+ **************************************************************************************************/
+function createErrorBtn() {
+  const errorBtn = createButtonWithAttributes(
+    "Placeholder",
+    "Stop Audio Recording",
+    "none",
+  );
+  //TODO: ADD ICON
+  errorBtn.append(createDomElement(Icons.stop_recording_audio));
+  errorBtn.addEventListener("click", () => {
+    alert(
+      "Youtube Anki Media Capture Error!\nModel and Field parameters not set. Click the extension button to open settings and set the required parameters.",
+    );
+  });
+  return errorBtn;
+}
+
+/**************************************************************************************************
  * General Button Functions                                                                       *
  **************************************************************************************************/
 /**
@@ -213,7 +248,7 @@ function createButtonWithAttributes(
   buttonID,
   tooltipName,
   tooltipShortcutKey,
-  isDisplayed = true
+  isDisplayed = true,
 ) {
   const button = document.createElement("button");
   button.id = buttonID;
@@ -224,11 +259,11 @@ function createButtonWithAttributes(
   button.setAttribute("aria-keyshortcuts", tooltipShortcutKey);
   button.setAttribute(
     "title",
-    tooltipName + " (keyboard shortcut [" + tooltipShortcutKey + "])"
+    tooltipName + " (keyboard shortcut [" + tooltipShortcutKey + "])",
   );
   button.setAttribute(
     "aria-label",
-    tooltipName + " keyboard shortcut " + tooltipShortcutKey
+    tooltipName + " keyboard shortcut " + tooltipShortcutKey,
   );
   return button;
 }
